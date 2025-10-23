@@ -104,9 +104,9 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-screen bg-white dark:bg-gray-900">
       {/* Header */}
-      <header className="border-b bg-card px-4 py-3 sm:px-6">
+      <header className="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-700 dark:bg-gray-800">
         <div className="flex items-center justify-between max-w-5xl mx-auto">
           <div className="flex items-center gap-2">
             <MessageSquare className="h-6 w-6" />
@@ -125,10 +125,10 @@ export default function ChatPage() {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex flex-col max-w-5xl w-full mx-auto">
         {/* Model Selector */}
-        <div className="border-b bg-card px-4 py-3 sm:px-6">
+        <div className="border-b border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-700 dark:bg-gray-800">
           {modelsLoading ? (
             <div className="animate-pulse">
-              <div className="h-10 bg-muted rounded"></div>
+              <div className="h-10 bg-gray-200 rounded dark:bg-gray-700"></div>
             </div>
           ) : (
             <ModelSelector
@@ -144,13 +144,13 @@ export default function ChatPage() {
           <div className="space-y-4">
             {messagesLoading ? (
               <div className="flex items-center justify-center h-full">
-                <div className="text-muted-foreground">Loading messages...</div>
+                <div className="text-gray-500 dark:text-gray-400">Loading messages...</div>
               </div>
             ) : messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
-                <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
+                <MessageSquare className="h-12 w-12 text-gray-400 mb-4" />
                 <h2 className="text-xl font-semibold mb-2">No messages yet</h2>
-                <p className="text-muted-foreground">
+                <p className="text-gray-500 dark:text-gray-400">
                   Start a conversation with {selectedModel}
                 </p>
               </div>
@@ -172,9 +172,9 @@ export default function ChatPage() {
         </div>
 
         {/* Input */}
-        <div className="border-t bg-card px-4 py-4 sm:px-6">
+        <div className="border-t border-gray-200 bg-white px-4 py-4 sm:px-6 dark:border-gray-700 dark:bg-gray-800">
           {sendMutation.isError && (
-            <div className="mb-3 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="mb-3 rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
               Error: {sendMutation.error.message}
             </div>
           )}

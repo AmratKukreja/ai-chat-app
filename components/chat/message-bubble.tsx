@@ -27,11 +27,11 @@ export function MessageBubble({ message, onDelete, isDeleting }: MessageBubblePr
       <div
         className={cn(
           "flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full",
-          isUser ? "bg-primary" : "bg-secondary"
+          isUser ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
         )}
       >
         {isUser ? (
-          <User className="h-4 w-4 text-primary-foreground" />
+          <User className="h-4 w-4" />
         ) : (
           <Bot className="h-4 w-4" />
         )}
@@ -46,14 +46,14 @@ export function MessageBubble({ message, onDelete, isDeleting }: MessageBubblePr
           className={cn(
             "rounded-lg px-4 py-2 break-words",
             isUser
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-foreground"
+              ? "bg-gray-900 text-white"
+              : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
           )}
         >
           <p className="text-sm whitespace-pre-wrap">{message.content}</p>
         </div>
         <div className="flex items-center gap-2 px-1">
-          <span className="text-xs text-muted-foreground">{timeString}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{timeString}</span>
           {isUser && onDelete && (
             <Button
               variant="ghost"
