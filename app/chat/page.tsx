@@ -35,9 +35,11 @@ export default function ChatPage() {
   }, [router, supabase.auth]);
 
   // Fetch models
-  const { data: models = [], isLoading: modelsLoading } =
+  const { data: models = [], isLoading: modelsLoading, error: modelsError } =
     trpc.models.getAvailable.useQuery(undefined, {
       enabled: !!user,
+      retry: 3,
+      retryDelay: 1000,
     });
 
   // Set default model when models load
@@ -129,6 +131,25 @@ export default function ChatPage() {
           {modelsLoading ? (
             <div className="animate-pulse">
               <div className="h-10 bg-gray-200 rounded dark:bg-gray-700"></div>
+            </div>
+          ) : modelsError ? (
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+              <p className="font-semibold">⚠️ Error loading models</p>
+              <p className="mt-1">{modelsError.message}</p>
+              <p className="mt-2 text-xs">
+                Please check:
+                <br />
+                1. Your .env.local file has correct Supabase credentials
+                <br />
+                2. You ran supabase-schema.sql in Supabase SQL Editor
+                <br />
+                3. Your Supabase project is active
+              </p>
+            </div>
+          ) : models.length === 0 ? (
+            <div className="rounded-md bg-yellow-50 p-3 text-sm text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400">
+              <p className="font-semibold">⚠️ No models found</p>
+              <p className="mt-1">Please run the supabase-schema.sql script in your Supabase SQL Editor to seed the models.</p>
             </div>
           ) : (
             <ModelSelector
