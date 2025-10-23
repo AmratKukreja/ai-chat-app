@@ -1,10 +1,8 @@
 import { router, protectedProcedure } from "../trpc";
 import { z } from "zod";
-import OpenAI from "openai";
 
-const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 export const chatRouter = router({
   send: protectedProcedure
@@ -34,15 +32,35 @@ export const chatRouter = router({
       // Generate AI response
       let aiResponse: string;
 
-      if (openai) {
+      if (OPENROUTER_API_KEY) {
         try {
-          const completion = await openai.chat.completions.create({
-            model: input.modelTag,
-            messages: [{ role: "user", content: input.prompt }],
+          const response = await fetch(OPENROUTER_API_URL, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+              "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+              "X-Title": "AI Chat App",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: input.modelTag,
+              messages: [
+                {
+                  role: "user",
+                  content: input.prompt,
+                },
+              ],
+            }),
           });
-          aiResponse = completion.choices[0]?.message?.content || "No response";
+
+          if (!response.ok) {
+            throw new Error(`OpenRouter API error: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          aiResponse = data.choices[0]?.message?.content || "No response";
         } catch (error) {
-          console.error("OpenAI API error:", error);
+          console.error("OpenRouter API error:", error);
           aiResponse = `Error calling ${input.modelTag}. Using stub response instead: You said: "${input.prompt}"`;
         }
       } else {

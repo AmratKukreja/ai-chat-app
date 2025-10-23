@@ -50,11 +50,14 @@ create index if not exists messages_user_id_idx on public.messages(user_id);
 create index if not exists messages_created_at_idx on public.messages(created_at);
 create index if not exists messages_model_tag_idx on public.messages(model_tag);
 
--- Seed data for models
+-- Seed data for models (OpenRouter format)
 insert into public.models (name, tag, description) values
-  ('GPT-4o', 'gpt-4o', 'Most capable GPT-4 model, great for complex tasks'),
-  ('GPT-4o Mini', 'gpt-4o-mini', 'Affordable and fast GPT-4 model'),
-  ('GPT-3.5 Turbo', 'gpt-3.5-turbo', 'Fast and efficient for most tasks'),
-  ('Claude 3.5 Sonnet', 'claude-3-5-sonnet-20241022', 'Anthropic Claude model for nuanced tasks')
+  ('GPT-4o', 'openai/gpt-4o', 'Most capable GPT-4 model via OpenRouter'),
+  ('GPT-4o Mini', 'openai/gpt-4o-mini', 'Affordable and fast GPT-4 model'),
+  ('GPT-3.5 Turbo', 'openai/gpt-3.5-turbo', 'Fast and efficient for most tasks'),
+  ('Claude 3.5 Sonnet', 'anthropic/claude-3.5-sonnet', 'Anthropic Claude model for nuanced tasks'),
+  ('Claude 3 Opus', 'anthropic/claude-3-opus', 'Most powerful Claude model'),
+  ('Gemini Pro', 'google/gemini-pro', 'Google Gemini Pro model'),
+  ('Llama 3.1 70B', 'meta-llama/llama-3.1-70b-instruct', 'Meta Llama 3.1 70B Instruct')
 on conflict (tag) do nothing;
 

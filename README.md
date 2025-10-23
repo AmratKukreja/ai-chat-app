@@ -26,7 +26,7 @@ A modern, full-stack chat application built with Next.js 14, tRPC, and Supabase 
 - **Backend**: tRPC for type-safe APIs
 - **Database**: Supabase (PostgreSQL with Row Level Security)
 - **Authentication**: Supabase Auth
-- **AI Integration**: OpenAI API (with stub fallback)
+- **AI Integration**: OpenRouter API (access to 100+ models including GPT-4, Claude, Gemini, Llama)
 - **State Management**: TanStack Query (React Query)
 
 ## 📋 Setup Instructions
@@ -34,7 +34,7 @@ A modern, full-stack chat application built with Next.js 14, tRPC, and Supabase 
 ### Prerequisites
 - Node.js 18+ installed
 - A Supabase account (free tier works)
-- OpenAI API key (optional - will use stub responses without it)
+- OpenRouter API key (optional - will use stub responses without it)
 
 ### 1. Clone and Install
 
@@ -60,8 +60,11 @@ Create a `.env.local` file in the root directory:
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# Optional: OpenAI API (will use stub responses if not provided)
-OPENAI_API_KEY=your_openai_api_key_here
+# Optional: OpenRouter API (will use stub responses if not provided)
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+
+# Optional: Site URL for OpenRouter rankings
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 **Where to find Supabase credentials:**
@@ -82,23 +85,37 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### AI API Integration
 
+The app uses **OpenRouter** which provides unified access to multiple AI models including OpenAI, Anthropic Claude, Google Gemini, and Meta Llama.
+
 The app supports two modes:
 
-1. **With OpenAI API Key**: 
-   - Add your `OPENAI_API_KEY` to `.env.local`
-   - The app will make real API calls to OpenAI models
-   - Supports GPT-4o, GPT-4o-mini, GPT-3.5-turbo
+1. **With OpenRouter API Key**: 
+   - Get your free API key from [openrouter.ai/keys](https://openrouter.ai/keys)
+   - Add your `OPENROUTER_API_KEY` to `.env.local`
+   - The app will make real API calls to any supported model
+   - Supports: GPT-4o, GPT-3.5-turbo, Claude 3.5, Gemini Pro, Llama 3.1, and many more!
 
 2. **Without API Key (Stub Mode)**:
-   - Leave `OPENAI_API_KEY` empty or omit it
+   - Leave `OPENROUTER_API_KEY` empty or omit it
    - The app will return echo responses: `"[model] stub: You said: {your message}"`
    - Perfect for testing the UI and functionality without API costs
 
-The stub implementation is in `server/routers/chat.ts`:
+The implementation is in `server/routers/chat.ts`:
 
 ```typescript
-if (openai) {
-  // Call real OpenAI API
+if (OPENROUTER_API_KEY) {
+  // Call OpenRouter API
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: input.modelTag,
+      messages: [{ role: "user", content: input.prompt }]
+    })
+  });
 } else {
   // Return stub response
   aiResponse = `[${input.modelTag} stub] You said: "${input.prompt}"`;
@@ -141,7 +158,12 @@ if (openai) {
 The app uses three main tables:
 
 1. **auth.users** - Managed by Supabase Auth
-2. **models** - Stores available AI models (GPT-4o, GPT-3.5-turbo, etc.)
+2. **models** - Stores available AI models with OpenRouter-compatible tags
+   - GPT-4o (`openai/gpt-4o`)
+   - Claude 3.5 Sonnet (`anthropic/claude-3.5-sonnet`)
+   - Gemini Pro (`google/gemini-pro`)
+   - Llama 3.1 70B (`meta-llama/llama-3.1-70b-instruct`)
+   - And more!
 3. **messages** - Stores chat history with user_id, model_tag, role, and content
 
 All tables have Row Level Security (RLS) enabled to ensure users can only access their own data.
@@ -171,7 +193,8 @@ All tables have Row Level Security (RLS) enabled to ensure users can only access
 Make sure to add these in your Vercel dashboard:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `OPENAI_API_KEY` (optional)
+- `OPENROUTER_API_KEY` (optional)
+- `NEXT_PUBLIC_SITE_URL` (your production URL)
 
 ## 🧪 Testing Locally
 
@@ -181,9 +204,9 @@ Make sure to add these in your Vercel dashboard:
    - Verify session persists across refreshes
 
 2. **Test Chat:**
-   - Select different AI models
+   - Select different AI models (GPT-4o, Claude, Gemini, Llama)
    - Send messages and verify responses
-   - Test with and without OpenAI API key
+   - Test with and without OpenRouter API key
 
 3. **Test Features:**
    - Toggle dark/light mode
